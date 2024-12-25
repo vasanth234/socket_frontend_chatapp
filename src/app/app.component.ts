@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SocketserviceService } from './socketservice.service';
+import { SocketService } from './socketservice.service';
 
 @Component({
   selector: 'app-root',
@@ -154,18 +154,17 @@ export class AppComponent implements OnInit {
   message = '';
   messages: string[] = [];
 
-  constructor(private socketService: SocketserviceService) {}
+  constructor(private socketService: SocketService) {}
 
-  ngOnInit() {
-    this.socketService.onMessage((msg) => {
+  ngOnInit(): void {
+    this.socketService.onMessage().subscribe((msg) => {
       this.messages.push(msg);
     });
   }
 
-  sendMessage() {
+  sendMessage(): void {
     if (this.message.trim()) {
       this.socketService.sendMessage(this.message);
-      this.messages.push(this.message); // For demo purposes, show sent message locally
       this.message = '';
     }
   }
