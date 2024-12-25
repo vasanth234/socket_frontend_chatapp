@@ -1,30 +1,52 @@
 import { Injectable } from '@angular/core';
-import { io, Socket } from 'socket.io-client';
+import { Observable, Subject } from 'rxjs';
+import { io } from 'socket.io-client';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class SocketserviceService {
-  private socket: Socket;
+
+  private socket: any;
+  private messageSubject = new Subject<string>();
 
   constructor() {
-    this.socket = io('https://socket-backend-tbtq.onrender.com'); // Replace with your backend URL
+    // Connect to the Socket.IO server
+    this.socket = io('https://socket-backend-tbtq.onrender.com/'); // Replace with your actual server URL
   }
 
-  // Emit events to the server
-  sendMessage(message: string): void {
+  sendMessage(message: string) {
     this.socket.emit('message', message);
   }
 
-  // Listen to events from the server
-  onMessage(callback: (message: string) => void): void {
-    this.socket.on('message', callback);
+  onMessage(p0: (msg: any) => void): Observable<string> {
+    return this.messageSubject.asObservable();
   }
 
-  // Disconnect the socket
-  disconnect(): void {
-    if (this.socket) {
-      this.socket.disconnect();
-    }
+  private emitMessage(msg: string) {
+    this.messageSubject.next(msg);
+  }
+
+  initListeners() {
+    // Listen to incoming messages and broadcast them using the subject
+    this.socket.on('message', (msg: string) => {
+      this.emitMessage(msg);
+    });
+
+    this.socket.on('connect_error', (error: any) => {
+      console.error('Connection error:', error);
+    });
+
+    this.socket.on('connect_timeout', () => {
+      console.error('Connection timeout');
+    });
+
+    this.socket.on('disconnect', (reason: any) => {
+      console.warn('Disconnected from server:', reason);
+    });
+  }
+
+  disconnect() {
+    this.socket.disconnect();
   }
 }
