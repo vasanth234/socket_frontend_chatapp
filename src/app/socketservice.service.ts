@@ -10,50 +10,43 @@ export class SocketService {
   private messageSubject = new Subject<string>();
 
   constructor() {
-    // Connect to the Socket.IO server
+    // Initialize socket connection
     this.socket = io('https://socket-backend-tbtq.onrender.com/'); // Replace with your actual server URL
     this.initListeners();
   }
 
-  // Send a message to the server
+  // Emit the message
   sendMessage(message: string): void {
-    this.socket.emit('message', message);
+    if (this.socket.connected) {
+      this.socket.emit('message', message);
+    }
   }
 
-  // Observable to subscribe to incoming messages
+  // Listen for incoming messages
   onMessage(): Observable<string> {
     return this.messageSubject.asObservable();
   }
 
-  // Emit messages using the Subject
-  private emitMessage(msg: string): void {
-    this.messageSubject.next(msg);
-  }
-
-  // Initialize listeners for incoming events
+  // Initialize socket event listeners
   private initListeners(): void {
-    // Listen for 'message' events from the server
     this.socket.on('message', (msg: string) => {
-      this.emitMessage(msg); // Emit the received message to the Subject
+      this.messageSubject.next(msg);
     });
 
-    // Listen for connection errors
     this.socket.on('connect_error', (error: any) => {
       console.error('Connection error:', error);
     });
 
-    // Listen for connection timeout events
     this.socket.on('connect_timeout', () => {
       console.error('Connection timeout');
     });
 
-    // Listen for disconnection events
     this.socket.on('disconnect', (reason: any) => {
       console.warn('Disconnected from server:', reason);
     });
   }
 
-  // Disconnect the socket connection
+  // Disconnect from the socket
   disconnect(): void {
     this.socket.disconnect();
   }
