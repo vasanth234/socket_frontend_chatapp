@@ -1,0 +1,7 @@
+we contructed tjis project separately front end and backend
+
+first for backend we installed these packages-->npm install express socket.io
+
+after in front end side we installed these mentioned packages--->npm install socket.io-client
+
+we had written the code and we using here angular verison is 16 for getting the app.module.ts
