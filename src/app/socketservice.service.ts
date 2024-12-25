@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 })
 export class SocketserviceService {
 
-  private socket = io('http://localhost:3000'); // Backend URL
+  private socket = io('https://socket-backend-tbtq.onrender.com/'); // Backend URL
 
   // Emit events to the server
   sendMessage(message: string) {
